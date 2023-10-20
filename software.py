@@ -210,39 +210,52 @@ def main():
     window = tk.Tk()
     window.title("Saifee Homeopathic Clinic")
 
+    # Create a canvas to contain the entire content of the window
+    canvas = tk.Canvas(window)
+    canvas.pack(side="left", fill="both", expand=True)
+
+    # Create a frame to place inside the canvas
+    content_frame = tk.Frame(canvas)
+    canvas.create_window((0, 0), window=content_frame, anchor="nw")
+
+    # Add a vertical scrollbar
+    scrollbar = tk.Scrollbar(window, orient="vertical", command=canvas.yview)
+    scrollbar.pack(side="right", fill="y")
+    canvas.configure(yscrollcommand=scrollbar.set)
+
     # Create labels and entry fields for patient information
-    first_name_label = tk.Label(window, text="First Name:")
-    first_name_entry = tk.Entry(window)
+    first_name_label = tk.Label(content_frame, text="First Name:")
+    first_name_entry = tk.Entry(content_frame)
 
-    last_name_label = tk.Label(window, text="Last Name:")
-    last_name_entry = tk.Entry(window)
+    last_name_label = tk.Label(content_frame, text="Last Name:")
+    last_name_entry = tk.Entry(content_frame)
 
-    age_label = tk.Label(window, text="Age:")
-    age_entry = tk.Entry(window)
+    age_label = tk.Label(content_frame, text="Age:")
+    age_entry = tk.Entry(content_frame)
 
-    gender_label = tk.Label(window, text="Gender:")
+    gender_label = tk.Label(content_frame, text="Gender:")
     gender_var = tk.StringVar()
     gender_var.set("Male")  # Set default gender to Male
-    gender_male_radio = tk.Radiobutton(window, text="Male", variable=gender_var, value="Male")
-    gender_female_radio = tk.Radiobutton(window, text="Female", variable=gender_var, value="Female")
+    gender_male_radio = tk.Radiobutton(content_frame, text="Male", variable=gender_var, value="Male")
+    gender_female_radio = tk.Radiobutton(content_frame, text="Female", variable=gender_var, value="Female")
 
-    address_label = tk.Label(window, text="Address:")
-    address_entry = tk.Entry(window)
+    address_label = tk.Label(content_frame, text="Address:")
+    address_entry = tk.Entry(content_frame)
 
-    phone_label = tk.Label(window, text="Phone:")
-    phone_entry = tk.Entry(window)
+    phone_label = tk.Label(content_frame, text="Phone:")
+    phone_entry = tk.Entry(content_frame)
 
-    date_label = tk.Label(window, text="Date:")
-    date_entry = tk.Entry(window)
+    date_label = tk.Label(content_frame, text="Date:")
+    date_entry = tk.Entry(content_frame)
     date_entry.insert(0, date.today())  # Set default date to current date
 
-    description_label = tk.Label(window, text="Description:")
-    description_entry = tk.Text(window, height=5, width=40, wrap="word")  # Use Text widget for multi-line input
+    description_label = tk.Label(content_frame, text="Description:")
+    description_entry = tk.Text(content_frame, height=5, width=40, wrap="word")  # Use Text widget for multi-line input
 
-    prescription_label = tk.Label(window, text="Prescription:")
-    prescription_entry = tk.Text(window, height=5, width=40, wrap="word")  # Use Text widget for multi-line input
+    prescription_label = tk.Label(content_frame, text="Prescription:")
+    prescription_entry = tk.Text(content_frame, height=5, width=40, wrap="word")  # Use Text widget for multi-line input
 
-    add_button = tk.Button(window, text="Add Record", command=lambda: add_patient_record(connection,
+    add_button = tk.Button(content_frame, text="Add Record", command=lambda: add_patient_record(connection,
                                                                                         first_name_entry,
                                                                                         last_name_entry,
                                                                                         age_entry,
@@ -254,15 +267,15 @@ def main():
                                                                                         prescription_entry,
                                                                                         tree))
 
-    search_label = tk.Label(window, text="Search Patient:")
-    search_entry = tk.Entry(window)
+    search_label = tk.Label(content_frame, text="Search Patient:")
+    search_entry = tk.Entry(content_frame)
 
-    search_button = tk.Button(window, text="Search", command=lambda: search_patient_record(connection, tree, search_entry.get().lower()))
+    search_button = tk.Button(content_frame, text="Search", command=lambda: search_patient_record(connection, tree, search_entry.get().lower()))
 
-    edit_label = tk.Label(window, text="Edit Record:")
-    edit_entry = tk.Entry(window)
+    edit_label = tk.Label(content_frame, text="Edit Record:")
+    edit_entry = tk.Entry(content_frame)
 
-    edit_button = tk.Button(window, text="Re-visit", command=lambda: edit_patient_record(connection,
+    edit_button = tk.Button(content_frame, text="Re-visit", command=lambda: edit_patient_record(connection,
                                                                                   edit_entry.get(),
                                                                                   first_name_entry,
                                                                                   last_name_entry,
@@ -275,7 +288,7 @@ def main():
                                                                                   prescription_entry,
                                                                                   tree))
 
-    update_button = tk.Button(window, text="Update", command=lambda: update_patient_record(connection,
+    update_button = tk.Button(content_frame, text="Update", command=lambda: update_patient_record(connection,
                                                                                         edit_entry.get(),
                                                                                         first_name_entry,
                                                                                         last_name_entry,
@@ -288,14 +301,14 @@ def main():
                                                                                         prescription_entry,
                                                                                         tree))
 
-    delete_button = tk.Button(window, text="Delete", command=lambda: delete_patient_record(connection,
+    delete_button = tk.Button(content_frame, text="Delete", command=lambda: delete_patient_record(connection,
                                                                                       edit_entry.get(),
                                                                                       tree))
 
-    display_text = tk.Label(window, text="", justify="left")
+    display_text = tk.Label(content_frame, text="", justify="left")
 
     # Create a Treeview widget for displaying records in a table
-    tree = ttk.Treeview(window, columns=("First Name", "Last Name", "Age", "Gender", "Address", "Phone", "Date", "Description", "Prescription"), show="headings")
+    tree = ttk.Treeview(content_frame, columns=("First Name", "Last Name", "Age", "Gender", "Address", "Phone", "Date", "Description", "Prescription"), show="headings")
 
     # Define the headings for the columns
     tree.heading("First Name", text="First Name")
@@ -342,10 +355,9 @@ def main():
     delete_button.pack()
     display_text.pack()
 
-    # Make the UI scrollable
-    scroll_y = ttk.Scrollbar(window, orient="vertical", command=tree.yview)
-    scroll_y.pack(side="right", fill="y")
-    tree.configure(yscrollcommand=scroll_y.set)
+    # Update the canvas scroll region when the content frame changes size
+    content_frame.update_idletasks()
+    canvas.config(scrollregion=canvas.bbox("all"))
 
     # Main loop
     window.mainloop()
