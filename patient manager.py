@@ -20,21 +20,17 @@ class PatientRecordApp(QMainWindow):
 
         self.init_ui()
 
-        # Add a display_text attribute
         self.display_text = QLabel()
 
-        # Initialize SQLite connection and create the table
         self.connection = self.create_connection()
         if self.connection:
             self.create_table(self.connection)
 
-        # Function to create a backup periodically (every 24 hours)
         self.periodic_backup()
 
     def init_ui(self):
         layout = QGridLayout()
 
-        # Create labels and entry fields for patient information
         first_name_label = QLabel("First Name:")
         self.first_name_entry = QLineEdit()
 
@@ -127,7 +123,6 @@ class PatientRecordApp(QMainWindow):
 
         layout.addWidget(self.tree, 15, 0, 1, 3)
 
-        # Button for import
         import_button = QPushButton("Import Data")
         import_button.clicked.connect(self.import_data)
         layout.addWidget(import_button, 16, 0, 1, 3)
@@ -188,10 +183,8 @@ class PatientRecordApp(QMainWindow):
             backup_db_path = os.path.join(backup_folder, "patient_records_backup.db")
             backup_excel_path = os.path.join(backup_folder, "patient_records_backup.xlsx")
 
-            # Backup the SQLite database
             shutil.copy2("patient_records.db", backup_db_path)
 
-            # Export SQLite data to Excel
             cursor = self.connection.cursor()
             cursor.execute("SELECT * FROM patient_records")
             records = cursor.fetchall()
@@ -229,7 +222,6 @@ class PatientRecordApp(QMainWindow):
             self.clear_entry_fields()
             self.update_table()
 
-            # Update the backup after adding a record
             self.update_backup()
             self.create_backup()
         except Error as e:
@@ -268,7 +260,6 @@ class PatientRecordApp(QMainWindow):
             self.clear_entry_fields()
             self.update_table()
 
-            # Update the backup after updating a record
             self.update_backup()
             self.create_backup()
         except Error as e:
@@ -289,11 +280,9 @@ class PatientRecordApp(QMainWindow):
             ''', (f'%{search_query}%', f'%{search_query}%'))
             records = cursor.fetchall()
 
-            # Clear the existing entries in the table
             self.tree.clear()
 
             if records:
-                # Insert new records into the table
                 for record in records:
                     item = QTreeWidgetItem([str(field) for field in record[1:]])
                     self.tree.addTopLevelItem(item)
@@ -318,10 +307,8 @@ class PatientRecordApp(QMainWindow):
             record = cursor.fetchone()
 
             if record:
-                # Clear the existing record
                 self.clear_entry_fields()
 
-                # Unpack the record and populate entry fields
                 _, first_name, last_name, age, gender, address, phone, date, description, prescription = record
                 self.first_name_entry.setText(first_name)
                 self.last_name_entry.setText(last_name)
@@ -338,7 +325,6 @@ class PatientRecordApp(QMainWindow):
                 QMessageBox.information(self, "Editing", "Editing selected record.")
             else:
                 QMessageBox.information(self, "No Matches", "No matching patient records found to edit.")
-                # Clear the table
                 self.tree.clear()
         except Error as e:
             print(f"Error editing patient record: {e}")
@@ -357,7 +343,6 @@ class PatientRecordApp(QMainWindow):
             ''', (f'%{selected_record}%', f'%{selected_record}%'))
             self.connection.commit()
             QMessageBox.information(self, "Success", "Patient record deleted successfully.")
-            # Clear the table
             self.tree.clear()
         except Error as e:
             print(f"Error deleting patient record: {e}")
@@ -367,10 +352,10 @@ class PatientRecordApp(QMainWindow):
         self.first_name_entry.clear()
         self.last_name_entry.clear()
         self.age_entry.clear()
-        self.gender_male_radio.setChecked(True)  # Set default gender to Male
+        self.gender_male_radio.setChecked(True) 
         self.address_entry.clear()
         self.phone_entry.clear()
-        self.date_entry.setText(QDate.currentDate().toString(Qt.ISODate))  # Set default date to current date
+        self.date_entry.setText(QDate.currentDate().toString(Qt.ISODate))  
         self.description_entry.clear()
         self.prescription_entry.clear()
 
@@ -394,7 +379,6 @@ class PatientRecordApp(QMainWindow):
         with open("config.json", "w") as config_file:
             json.dump(config, config_file)
     
-    # def create_backup():@pyqtSlot()
 
     def ask_backup_folder(self):
         backup_folder = QFileDialog.getExistingDirectory(self, "Select Backup Folder")
@@ -407,7 +391,6 @@ class PatientRecordApp(QMainWindow):
         backup_folder_path = self.get_backup_folder()
 
         if not backup_folder_path:
-            # Ask the user to choose the backup folder if it hasn't been set
             backup_folder_path = self.ask_backup_folder()
             if not backup_folder_path:
                 return  # User canceled the backup
@@ -417,10 +400,8 @@ class PatientRecordApp(QMainWindow):
         try:
             os.makedirs(backup_folder_path, exist_ok=True)
 
-            # Backup the SQLite database
             shutil.copy2("patient_records.db", os.path.join(backup_folder_path, "patient_records_backup.db"))
 
-            # Export SQLite data to Excel
             cursor = self.connection.cursor()
             cursor.execute("SELECT * FROM patient_records")
             records = cursor.fetchall()
@@ -437,13 +418,11 @@ class PatientRecordApp(QMainWindow):
         try:
             backup_folder = "backup"
 
-            # Ask user to choose the import file
             import_file_path, _ = QFileDialog.getOpenFileName(self, "Select Import File", "", "Excel files (*.xlsx);;All files (*)")
 
             if not import_file_path:
-                return  # User canceled the import
+                return 
 
-            # Import data from Excel to SQLite
             connection = self.create_connection()
             if connection:
                 df = pd.read_excel(import_file_path)
@@ -472,7 +451,6 @@ class PatientRecordApp(QMainWindow):
         self.create_backup()
 
     def closeEvent(self, event):
-        # Close the SQLite connection when the application is closed
         if self.connection:
             self.connection.close()
 
