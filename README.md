@@ -87,7 +87,9 @@ The software incorporates periodic backup functionality to safeguard patient dat
 6. **Periodic Backup**: The application automatically creates a backup every 24 hours.
 
 ## Preview
-[(img.png)]
+[Patient manager Ms](https://i.imgur.com/BTytPdz.png)
+
+[Patient Manager Fs](https://i.imgur.com/Ke3yLiY.png)
 
 ## Contributing
 
